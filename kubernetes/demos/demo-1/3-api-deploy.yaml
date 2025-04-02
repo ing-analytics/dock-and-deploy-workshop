@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: exercise
+  name: exercise
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: exercise
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: exercise
+    spec:
+      containers:
+      - image: my-api:v1
+        name: my-api
+        env:
+        - name: APP_PORT
+          value: "8080"
+        - name: SERVER
+          value: "mssql.test-gladys.svc.cluster.local"
+        - name: USERNAME
+          value: "sa"
+        - name: PASSWORD
+          value: "MyPassword1!"
+        - name: DATABASE
+          value: "master"
+        resources: {}
+status: {}
