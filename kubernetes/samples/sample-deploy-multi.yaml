@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: sample-deploy
+  name: sample-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sample-deploy
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: sample-deploy
+    spec:
+      initContainers:
+      - name: init-1
+        image: busybox
+        command: ['sh', '-c', 'echo init script here']
+      containers:
+      - name: sidecar-1
+        image: busybox
+        command: ['sh', '-c', 'while true; do date && sleep 5; done']
+      - image: nginx
+        name: nginx
+        ports:
+        - containerPort: 80
+        resources: {}
+status: {}

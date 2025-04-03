@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: sample-sts
+spec:
+  serviceName: sample-sts
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sample-sts
+  template:
+    metadata:
+      labels:
+        app: sample-sts
+    spec:
+      containers:
+      - name: sample-sts
+        image: nginx
+        ports:
+        - containerPort: 80
+          name: web
+        volumeMounts:
+        - name: www
+          mountPath: /usr/share/nginx/html
+  volumeClaimTemplates:
+  - metadata:
+      name: www
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi

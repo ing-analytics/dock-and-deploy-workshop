@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  creationTimestamp: null
+  name: sample-job
+spec:
+  template:
+    metadata:
+      creationTimestamp: null
+    spec:
+      containers:
+      - image: busybox
+        name: sample-job
+        args: ["/bin/sh", "-c", "echo sleeping; sleep 20; echo awake"]
+        resources: {}
+      restartPolicy: Never
+status: {}
