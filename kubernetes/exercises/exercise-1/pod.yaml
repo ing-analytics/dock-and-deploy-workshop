@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+  labels:
+    run: my-pod
+spec:
+  # TODO: Add an init container that downloads the file
+  # https://raw.githubusercontent.com/ing-analytics/dock-and-deploy-workshop/refs/heads/main/assets/ex_static_site.html
+  # into /usr/share/nginx/html/index.html
+  initContainers:
+    - name: init-download-page
+      # << Start solution >>
+      image: busybox
+      command:
+        [
+          "sh",
+          "-c",
+          "wget -O /usr/share/nginx/html/index.html https://raw.githubusercontent.com/ing-analytics/dock-and-deploy-workshop/refs/heads/main/assets/ex_static_site.html",
+        ]
+      # << End solution >>
+      volumeMounts:
+        - name: html-volume
+          mountPath: /usr/share/nginx/html
+  containers:
+    - name: nginx-container
+      image: nginx
+      # TODO: Ensure the container is exposed on port 80
+      # << Start solution >>
+      ports:
+        - containerPort: 80
+      # << End solution >>
+      volumeMounts:
+        - name: html-volume
+          mountPath: /usr/share/nginx/html
+  volumes:
+    - name: html-volume
+      emptyDir: {}

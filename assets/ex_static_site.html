@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ING Dock and Deploy Workshop</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            text-align: center;
+            background-color: #ffffff;
+            padding: 50px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #ff6600;
+        }
+        p {
+            color: #333333;
+            font-size: 18px;
+        }
+        .button {
+            padding: 10px 20px;
+            background-color: #ff6600;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .button:hover {
+            background-color: #e65c00;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            margin-top: 18%;
+            transform: translate(-50%, -50%);
+            background-color: #28a745;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .logo {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to the ING Dock and Deploy Workshop!</h1>
+        <p>We're excited to have you here. Get ready to dive into the world of Docker and Kubernetes.</p>
+        <button class="button" onclick="showPopup()">I am ready!</button>
+    </div>
+    <div class="popup" id="popup">
+        <p>Great job! 💪</p>
+    </div>
+    <script>
+        function showPopup() {
+            document.getElementById('popup').style.display = 'block';
+            setTimeout(function() {
+                document.getElementById('popup').style.display = 'none';
+            }, 2000);
+        }
+    </script>
+</body>
