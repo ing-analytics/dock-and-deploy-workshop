@@ -5,4 +5,15 @@ metadata:
   labels:
     run: exercise-1
 spec:
-# TODO
+  initContainers:
+    - name: init-download-page
+      volumeMounts:
+        - name: html-volume
+          mountPath: /usr/share/nginx/html
+      # TODO: Add init container definition:
+  containers:
+    - name: nginx-container
+      volumeMounts:
+        - name: html-volume
+          mountPath: /usr/share/nginx/html
+      # TODO: Define the container:
