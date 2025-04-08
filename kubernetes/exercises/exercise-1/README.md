@@ -1,8 +1,8 @@
 # Exercise 1
 
-The goal of this exercise is to learn how to create a pod with an init container, transition it to a deployment and scale it.
+The goal of this exercise is to learn how to create a pod with an init container, upgrade it to a deployment and scale it.
 
-1. Create a configuration file `exercise1.yaml` defining a pod with:
+1. Create a configuration file `exercise.yaml` defining a pod with:
    - An init container that wait for a specific file to be available before the main container starts.
    - A main container that serves a simple web application
 2. Convert the pod into a deployment
