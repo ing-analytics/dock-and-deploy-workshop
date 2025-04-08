@@ -6,7 +6,7 @@ metadata:
     run: exercise-1
 spec:
   # TODO: Add an init container that downloads the file
-  # https://raw.githubusercontent.com/ing-analytics/dock-and-deploy-workshop/refs/heads/kubernetes-practice/assets/ex_static_site.html
+  # https://raw.githubusercontent.com/ing-analytics/dock-and-deploy-workshop/refs/heads/main/assets/ex_static_site.html
   # into /usr/share/nginx/html/index.html
   initContainers:
     - name: init-download-page
@@ -16,7 +16,7 @@ spec:
         [
           "sh",
           "-c",
-          "wget -O /usr/share/nginx/html/index.html https://raw.githubusercontent.com/ing-analytics/dock-and-deploy-workshop/refs/heads/kubernetes-practice/assets/ex_static_site.html",
+          "wget -O /usr/share/nginx/html/index.html https://raw.githubusercontent.com/ing-analytics/dock-and-deploy-workshop/refs/heads/main/assets/ex_static_site.html",
         ]
       # << End solution >>
       volumeMounts:
