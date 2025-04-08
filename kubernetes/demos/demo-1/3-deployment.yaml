@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment
+  labels:
+    run: kubernetes-demo
+spec:
+  replicas: 2 # Two pods
+  selector:
+    matchLabels:
+      run: kubernetes-demo
+  template:
+    metadata:
+      labels:
+        run: kubernetes-demo
+    spec:
+      initContainers:
+        - name: init-download
+          image: busybox
+          command:
+            [
+              "sh",
+              "-c",
+              "wget -O /usr/share/nginx/html/index.html https://raw.githubusercontent.com/ing-analytics/dock-and-deploy-workshop/refs/heads/main/assets/demo_static_site.html",
+            ]
+          volumeMounts:
+            - name: html-volume
+              mountPath: /usr/share/nginx/html
+      containers:
+        - name: nginx-container
+          image: nginx
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: html-volume
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: html-volume
+          emptyDir: {}

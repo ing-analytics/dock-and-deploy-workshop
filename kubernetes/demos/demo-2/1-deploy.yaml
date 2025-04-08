@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment
+  labels:
+    run: kubernetes-demo
+spec:
+  selector:
+    matchLabels:
+      run: kubernetes-demo
+  template:
+    metadata:
+      labels:
+        run: kubernetes-demo
+    spec:
+      containers:
+        - name: counter-api
+          image: counter-api
+          ports:
+            - containerPort: 80
+          env:
+            name: COUNTER_APP_FILEPATH
+            value: "/app/counter/counter.txt"
+          volumeMounts:
+            - name: counter-volume
+              mountPath: /app/counter
+      volumes:
+        - name: counter-volume
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    run: kubernetes-demo
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: ClusterIP

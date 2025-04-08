@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: api-request-job
+spec:
+  template:
+    spec:
+      containers:
+      - name: api-request-container
+        image: curlimages/curl:latest
+        command: ["/bin/sh", "-c"]
+        args: ["for i in {1..3}; do curl -X GET 'https://api.example.com/endpoint'; done"]
+      restartPolicy: Never
+  backoffLimit: 4
+  
