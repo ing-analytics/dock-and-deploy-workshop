@@ -1,0 +1,109 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: site-config
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>My Site</title>
+      <style>
+        table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        table, th, td {
+          border: 1px solid black;
+        }
+        th, td {
+          padding: 8px;
+          text-align: left;
+        }
+      </style>
+    </head>
+    <body>
+      <h1>Welcome to My Site</h1>
+      <h2>Data from CSV</h2>
+      <table id="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Age</th>
+            <th>City</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Data will be inserted here -->
+        </tbody>
+      </table>
+
+      <script>
+        fetch('/data.csv')
+          .then(response => response.text())
+          .then(data => {
+            const rows = data.split('\\n').slice(1); // Skip header row
+            const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
+
+            rows.forEach(row => {
+              const cells = row.split(',');
+              const tableRow = document.createElement('tr');
+
+              cells.forEach(cell => {
+                const tableCell = document.createElement('td');
+                tableCell.textContent = cell;
+                tableRow.appendChild(tableCell);
+              });
+
+              tableBody.appendChild(tableRow);
+            });
+          })
+          .catch(error => console.error('Error fetching data:', error));
+      </script>
+    </body>
+    </html>
+  data.csv: |
+    name,age,city
+    Alice,30,New York
+    Bob,25,Los Angeles
+    Charlie,35,Chicago
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: site-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: site
+  template:
+    metadata:
+      labels:
+        app: site
+    spec:
+      containers:
+      - name: site-container
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: site-volume
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: site-volume
+        configMap:
+          name: site-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: site-service
+spec:
+  selector:
+    app: site
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: LoadBalancer
