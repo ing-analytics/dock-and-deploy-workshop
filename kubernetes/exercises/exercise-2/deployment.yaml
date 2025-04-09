@@ -19,7 +19,7 @@ spec:
             [
               "sh",
               "-c",
-              "wget -O /usr/share/nginx/html/index.html https://raw.githubusercontent.com/ing-analytics/dock-and-deploy-workshop/refs/heads/kubernetes-practice-2/assets/ex_data_site.html",
+              "wget -O /usr/share/nginx/html/index.html https://raw.githubusercontent.com/ing-analytics/dock-and-deploy-workshop/refs/heads/main/assets/ex_data_site.html",
             ]
           volumeMounts:
             - name: site-volume
