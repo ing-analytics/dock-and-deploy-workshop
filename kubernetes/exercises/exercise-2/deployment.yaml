@@ -24,6 +24,14 @@ spec:
           volumeMounts:
             - name: site-volume
               mountPath: /usr/share/nginx/html
+        - name: copy-data-files
+          image: busybox
+          command: ["/bin/sh", "-c", "cp /config/* /data/"]
+          volumeMounts:
+            - name: data-volume
+              mountPath: /data
+            - name: config-volume
+              mountPath: /config
       containers:
         - name: site-container
           image: nginx:latest
@@ -38,7 +46,8 @@ spec:
         - name: data-volume
           persistentVolumeClaim:
             claimName: data-pvc
-          configMap:
-            name: data-config
         - name: site-volume
           emptyDir: {}
+        - name: config-volume
+          configMap:
+            name: data-config
