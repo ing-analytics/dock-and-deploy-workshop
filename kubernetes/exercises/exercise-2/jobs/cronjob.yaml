@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: update-csv-cronjob
+  name: update-data-cronjob
 spec:
   schedule: "* * * * *"
   jobTemplate:
