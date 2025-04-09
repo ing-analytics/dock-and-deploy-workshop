@@ -26,7 +26,7 @@ spec:
               mountPath: /usr/share/nginx/html
         - name: copy-data-files
           image: busybox
-          command: ["/bin/sh", "-c", "cp /config/* /data/"]
+          command: ["/bin/sh", "-c", "cp /config/* /data/ && chmod -R 777 /data"]
           volumeMounts:
             - name: data-volume
               mountPath: /data
