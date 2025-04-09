@@ -17,3 +17,6 @@ spec:
         - name: html-volume
           mountPath: /usr/share/nginx/html
       # TODO: Define the container:
+  volumes:
+    - name: html-volume
+      emptyDir: {}
