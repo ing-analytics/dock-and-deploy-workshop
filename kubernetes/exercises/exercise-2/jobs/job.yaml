@@ -1,0 +1,12 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: update-data-job
+spec:
+  template:
+    spec:
+      # TODO: Complete job spec
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: data-pvc

@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: site-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: site
+  template:
+    metadata:
+      labels:
+        app: site
+    spec:
+      initContainers:
+        - name: init-download
+          image: busybox
+          command:
+            [
+              "sh",
+              "-c",
+              "wget -O /usr/share/nginx/html/index.html https://raw.githubusercontent.com/ing-analytics/dock-and-deploy-workshop/refs/heads/main/assets/ex_data_site.html",
+            ]
+          volumeMounts:
+            - name: site-volume
+              mountPath: /usr/share/nginx/html
+        - name: copy-data-files
+          image: busybox
+          command: ["/bin/sh", "-c", "cp /config/* /data/ && chmod -R 777 /data"]
+          volumeMounts:
+            - name: data-volume
+              mountPath: /data
+            - name: config-volume
+              mountPath: /config
+      containers:
+        - name: site-container
+          image: nginx:latest
+          ports:
+          - containerPort: 80
+          volumeMounts:
+          - name: site-volume
+            mountPath: /usr/share/nginx/html
+          - name: data-volume
+            mountPath: /usr/share/nginx/html/data
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: data-pvc
+        - name: site-volume
+          emptyDir: {}
+        - name: config-volume
+          configMap:
+            name: data-config
