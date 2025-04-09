@@ -12,7 +12,7 @@ spec:
           containers:
             - name: update-transactions-data
               image: curlimages/curl:latest
-              command: ["/bin/sh", "-c", "curl -o /data/data.csv https://raw.githubusercontent.com/ing-analytics/dock-and-deploy-workshop/refs/heads/kubernetes-practice-2/assets/transactions_data.csv && date '+%Y-%m-%d %H:%M:%S' > /data/timestamp.txt"]
+              command: ["/bin/sh", "-c", "curl -o /data/data.csv https://raw.githubusercontent.com/ing-analytics/dock-and-deploy-workshop/refs/heads/main/assets/transactions_data.csv && date '+%Y-%m-%d %H:%M:%S' > /data/timestamp.txt"]
               volumeMounts:
               - name: data-volume
                 mountPath: /data
