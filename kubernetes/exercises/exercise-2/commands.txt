@@ -1,0 +1,2 @@
+# Create configmap:
+kubectl create configmap data-config --from-file=./initial_data
