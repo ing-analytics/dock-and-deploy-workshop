@@ -3,70 +3,20 @@ kind: ConfigMap
 metadata:
   name: site-config
 data:
-  index.html: |
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>My Site</title>
-      <style>
-        table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-        table, th, td {
-          border: 1px solid black;
-        }
-        th, td {
-          padding: 8px;
-          text-align: left;
-        }
-      </style>
-    </head>
-    <body>
-      <h1>Welcome to My Site</h1>
-      <h2>Data from CSV</h2>
-      <table id="data-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Age</th>
-            <th>City</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Data will be inserted here -->
-        </tbody>
-      </table>
-
-      <script>
-        fetch('/data.csv')
-          .then(response => response.text())
-          .then(data => {
-            const rows = data.split('\\n').slice(1); // Skip header row
-            const tableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
-
-            rows.forEach(row => {
-              const cells = row.split(',');
-              const tableRow = document.createElement('tr');
-
-              cells.forEach(cell => {
-                const tableCell = document.createElement('td');
-                tableCell.textContent = cell;
-                tableRow.appendChild(tableCell);
-              });
-
-              tableBody.appendChild(tableRow);
-            });
-          })
-          .catch(error => console.error('Error fetching data:', error));
-      </script>
-    </body>
-    </html>
   data.csv: |
-    name,age,city
-    Alice,30,New York
-    Bob,25,Los Angeles
-    Charlie,35,Chicago
+    transaction_id,amount_eur,timestamp
+    1,67.13,2025-04-16T04:12:41Z
+    2,13.94,2025-04-16T01:40:10Z
+    3,26.78,2025-04-16T05:25:28Z
+    4,50.02,2025-04-16T22:08:59Z
+    5,82.60,2025-04-16T06:05:49Z
+    6,15.42,2025-04-16T09:25:03Z
+    7,93.42,2025-04-16T12:13:28Z
+    8,21.45,2025-04-16T18:55:28Z
+    9,69.98,2025-04-16T19:39:16Z
+    10,45.82,2025-04-16T22:26:21Z
+  timestamp.txt: |
+    2025-04-09T00:00:00
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -82,18 +32,30 @@ spec:
       labels:
         app: site
     spec:
+      initContainers:
+        - name: init-download
+          image: busybox
+          command:
+            [
+              "sh",
+              "-c",
+              "wget -O /usr/share/nginx/html/index.html https://raw.githubusercontent.com/ing-analytics/dock-and-deploy-workshop/refs/heads/kubernetes-practice-2/assets/ex_data_site.html",
+            ]
+          volumeMounts:
+            - name: site-volume
+              mountPath: /usr/share/nginx/html
       containers:
-      - name: site-container
-        image: nginx:latest
-        ports:
-        - containerPort: 80
-        volumeMounts:
-        - name: site-volume
-          mountPath: /usr/share/nginx/html
+        - name: site-container
+          image: nginx:latest
+          ports:
+          - containerPort: 80
+          volumeMounts:
+          - name: site-volume
+            mountPath: /usr/share/nginx/html
       volumes:
-      - name: site-volume
-        configMap:
-          name: site-config
+        - name: site-volume
+          configMap:
+            name: site-config
 ---
 apiVersion: v1
 kind: Service
@@ -106,4 +68,4 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
-  type: LoadBalancer
+  type: ClusterIP
