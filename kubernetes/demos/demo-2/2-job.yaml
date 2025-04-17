@@ -12,4 +12,3 @@ spec:
         args: ["for i in {1..3}; do curl -X GET 'https://api.example.com/endpoint'; done"]
       restartPolicy: Never
   backoffLimit: 4
-  
