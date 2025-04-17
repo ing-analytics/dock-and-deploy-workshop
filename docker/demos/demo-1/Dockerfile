@@ -1,10 +1,10 @@
-FROM python:3.11-bullseye 
+FROM python:3.11-bullseye
 
 ENV APP_HOST=0.0.0.0
-ENV APP_PORT=80
+ENV APP_PORT=8000
 
-WORKDIR app
-ENV PYTHONPATH=app
+WORKDIR /app
+ENV PYTHONPATH=/app
 
 # install mssql and unixodbc
 RUN apt-get update && \
@@ -14,13 +14,9 @@ RUN apt-get update && \
     apt-get update && \
     ACCEPT_EULA=Y apt-get install msodbcsql18 unixodbc-dev -y
 
-# optional for sqlcmd
-# RUN ACCEPT_EULA=Y apt-get install -y mssql-tools18 && \
-#     export PATH="$PATH:/opt/mssql-tools18/bin"'
-
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
 COPY *.py ./
 
-CMD ["python", "main.py"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

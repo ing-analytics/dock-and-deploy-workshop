@@ -4,17 +4,18 @@ import uvicorn
 
 from fastapi import FastAPI, Request, Body
 from fastapi.logger import logger
-from database import get_db_conn
+from contextlib import asynccontextmanager
 from sql import CREATE_USER_TABLE, INSERT_USER, SELECT_ONE, SELECT_USER
 
 app = FastAPI()
 logger.setLevel(logging.DEBUG)
 
-@app.on_event("startup")
-async def startup():
-   app.state.db = get_db_conn()
-   logger.info("HOORAY! APP STARTED")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logger.info("HOORAY! APP STARTED")
+    yield
 
+app = FastAPI(lifespan=lifespan)
 
 # Hello World Demo
 @app.get("/hello")
@@ -26,7 +27,6 @@ async def index():
 @app.get("/healthz")
 async def health():
    return {"Status": "Healthy"}
-
 
 
 # With Database
@@ -73,6 +73,6 @@ async def update_curr_user(request: Request, payload: dict = Body(...)):
 
 if __name__ == "__main__":
    host = os.getenv("APP_HOST", "0.0.0.0")
-   port = os.getenv("APP_PORT", "80")
+   port = os.getenv("APP_PORT", "8000")
 
    uvicorn.run(app, host=host, port=int(port))
