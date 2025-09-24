@@ -4,12 +4,6 @@ This is a simple app using Streamlit for workshop and demo use.
 
 ## About the API
 
-## Running the APP
-
-```sh
-streamlit run app.py
-```
-
 ### Building the Image
 
 ```sh
