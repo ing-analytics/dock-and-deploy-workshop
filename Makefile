@@ -31,12 +31,22 @@ docker-demo-1-run: docker-demo-1-build ## Run only the FastAPI app on http://loc
 	docker run --rm -it -p 8000:8000 my-api:v1
 
 .PHONY: docker-demo-1-up
-docker-demo-1-up: ## Start FastAPI + PostgreSQL on http://localhost:8000/db-health
-	docker compose -f $(DOCKER_DEMO_1)/compose.yaml up -d --build
+docker-demo-1-up: docker-demo-1-build ## Start FastAPI + PostgreSQL on http://localhost:8000/db-health
+	@# The leading `-` tells make to continue if the network already exists
+	-docker network create demo-1
+	docker run -d --name db --network demo-1 \
+		-e POSTGRES_USER=workshop -e POSTGRES_PASSWORD=workshop \
+		-e POSTGRES_DB=workshop \
+		postgres:17
+	docker run -d --name api --network demo-1 -p 8000:8000 \
+		-e SERVER=db:5432 -e DATABASE=workshop \
+		-e USERNAME=workshop -e PASSWORD=workshop \
+		my-api:v1
 
 .PHONY: docker-demo-1-down
 docker-demo-1-down: ## Stop and remove FastAPI + PostgreSQL
-	docker compose -f $(DOCKER_DEMO_1)/compose.yaml down
+	-docker rm -f api db
+	-docker network rm demo-1
 
 # --- Docker demo 2: Flask + Redis with Docker Compose ---------------------
 

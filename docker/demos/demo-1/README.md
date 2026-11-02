@@ -60,25 +60,36 @@ docker run --rm -p 8000:8000 my-api:v1
 
 Then open http://localhost:8000/hello.
 
-To use the database endpoints, pass the connection settings as environment variables:
+### Running the API with PostgreSQL
+
+The database endpoints need a PostgreSQL database. We run it in a second container.
+Both containers join the same Docker network, so the API can reach the database
+by its container name (`db`).
 
 ```sh
-docker run --rm -p 8000:8000 \
-  -e SERVER=my-db-server:5432 \
-  -e DATABASE=workshop \
-  -e USERNAME=workshop \
-  -e PASSWORD=workshop \
+# 1. Create a network for the two containers
+docker network create demo-1
+
+# 2. Start PostgreSQL
+docker run -d --name db --network demo-1 \
+  -e POSTGRES_USER=workshop -e POSTGRES_PASSWORD=workshop \
+  -e POSTGRES_DB=workshop \
+  postgres:17
+
+# 3. Start the API; SERVER=db:5432 points to the container named db
+docker run -d --name api --network demo-1 -p 8000:8000 \
+  -e SERVER=db:5432 -e DATABASE=workshop \
+  -e USERNAME=workshop -e PASSWORD=workshop \
   my-api:v1
-```
 
-### Running the API and PostgreSQL with Docker Compose
-
-`compose.yaml` starts PostgreSQL and the API together:
-
-```sh
-docker compose up -d --build
+# 4. Try it
 curl http://localhost:8000/db-health
-docker compose down
+curl -X POST http://localhost:8000/current-user -d '{"username":"workshop_user"}' -H "Content-Type: application/json"
+curl http://localhost:8000/current-user
+
+# 5. Clean up
+docker rm -f api db
+docker network rm demo-1
 ```
 
 ### Deploying to Kubernetes
