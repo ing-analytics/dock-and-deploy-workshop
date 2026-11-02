@@ -75,6 +75,8 @@ async def get_curr_user(request: Request):
 
 @app.post("/current-user")
 async def update_curr_user(request: Request, payload: dict = Body(...)):
+   if "username" not in payload:
+      return {"Error": "username is missing"}
    try:
       cursor = get_db(request).cursor()
       cursor.execute(INSERT_USER, (payload["username"],))
