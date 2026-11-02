@@ -1,21 +1,22 @@
 # Demo API
 
-This is a simple API using FastAPI for workshop/demo use.
+This is a simple API using FastAPI and PostgreSQL for workshop/demo use.
 
 ## About the API
 
 ### Environment Variables
 
-| Variable | Description         | Sample Value                    |
-|----------|---------------------|---------------------------------|
-| APP_HOST | hostname of the app | 0.0.0.0                         |
-| APP_PORT | port of the app     | 8000                            |
-| SERVER   | database server     | localhost:1433                  |
-| DATABASE | database            |                                 |
-| USERNAME | database username   |                                 |
-| PASSWORD | database password   |                                 |
-| DRIVER   | database driver     | {ODBC Driver 18 for SQL Server} |
+| Variable | Description         | Sample Value   |
+|----------|---------------------|----------------|
+| APP_HOST | hostname of the app | 0.0.0.0        |
+| APP_PORT | port of the app     | 8000           |
+| SERVER   | database server     | localhost:5432 |
+| DATABASE | database            | workshop       |
+| USERNAME | database username   | workshop       |
+| PASSWORD | database password   | workshop       |
 
+The database is [PostgreSQL](https://www.postgresql.org/). The app connects on the first
+request that needs the database, so it does not matter whether the app or the database starts first.
 
 ### Endpoints
 
@@ -63,11 +64,21 @@ To use the database endpoints, pass the connection settings as environment varia
 
 ```sh
 docker run --rm -p 8000:8000 \
-  -e SERVER=my-db-server:1433 \
-  -e DATABASE=my_db \
-  -e USERNAME=my_user \
-  -e PASSWORD=my_password \
+  -e SERVER=my-db-server:5432 \
+  -e DATABASE=workshop \
+  -e USERNAME=workshop \
+  -e PASSWORD=workshop \
   my-api:v1
+```
+
+### Running the API and PostgreSQL with Docker Compose
+
+`compose.yaml` starts PostgreSQL and the API together:
+
+```sh
+docker compose up -d --build
+curl http://localhost:8000/db-health
+docker compose down
 ```
 
 ### Deploying to Kubernetes

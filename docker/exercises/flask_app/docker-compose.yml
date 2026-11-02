@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:13
+    image: postgres:17
     # Hint: these values must match the ones hardcoded in web/web.py
     environment:
       POSTGRES_USER: ###

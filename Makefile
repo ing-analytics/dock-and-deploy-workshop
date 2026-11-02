@@ -20,15 +20,23 @@ lint: ## Lint all Dockerfiles with hadolint
 	hadolint $(DOCKER_DEMO_1)/Dockerfile $(DOCKER_DEMO_2)/Dockerfile \
 		$(K8S_DEMO_2)/Dockerfile docker/exercises/flask_app/web/Dockerfile
 
-# --- Docker demo 1: FastAPI app -------------------------------------------
+# --- Docker demo 1: FastAPI app + PostgreSQL --------------------------------
 
 .PHONY: docker-demo-1-build
 docker-demo-1-build: ## Build the FastAPI image (my-api:v1)
 	docker build -t my-api:v1 $(DOCKER_DEMO_1)
 
 .PHONY: docker-demo-1-run
-docker-demo-1-run: docker-demo-1-build ## Run the FastAPI app on http://localhost:8000/hello (Ctrl+C stops it)
+docker-demo-1-run: docker-demo-1-build ## Run only the FastAPI app on http://localhost:8000/hello (Ctrl+C stops it)
 	docker run --rm -it -p 8000:8000 my-api:v1
+
+.PHONY: docker-demo-1-up
+docker-demo-1-up: ## Start FastAPI + PostgreSQL on http://localhost:8000/db-health
+	docker compose -f $(DOCKER_DEMO_1)/compose.yaml up -d --build
+
+.PHONY: docker-demo-1-down
+docker-demo-1-down: ## Stop and remove FastAPI + PostgreSQL
+	docker compose -f $(DOCKER_DEMO_1)/compose.yaml down
 
 # --- Docker demo 2: Flask + Redis with Docker Compose ---------------------
 

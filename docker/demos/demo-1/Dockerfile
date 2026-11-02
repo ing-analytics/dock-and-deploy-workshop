@@ -1,4 +1,3 @@
-# python:3.14-slim is based on Debian 13 (trixie)
 FROM python:3.14-slim
 
 # PYTHONDONTWRITEBYTECODE: don't write .pyc files into the image
@@ -7,36 +6,6 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     APP_HOST=0.0.0.0 \
     APP_PORT=8000
-
-# Install the Microsoft ODBC driver for SQL Server (msodbcsql18).
-# We first install Microsoft's repo config package
-# (per https://learn.microsoft.com/en-us/linux/packages), which adds their
-# package repository and signing key, then install the driver from it.
-#
-# The commands are chained with `&&`: each one only runs if the previous
-# one succeeded, so the build stops at the first error.
-#
-# We don't pin apt package versions (hadolint rule DL3008): old versions are
-# removed from the Debian repos quickly, which would break the build.
-# hadolint ignore=DL3008
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl ca-certificates \
-    && . /etc/os-release \
-    && curl -sSL -o /tmp/packages-microsoft-prod.deb \
-        "https://packages.microsoft.com/config/${ID}/${VERSION_ID}/packages-microsoft-prod.deb" \
-    && apt-get install -y --no-install-recommends /tmp/packages-microsoft-prod.deb \
-    && rm /tmp/packages-microsoft-prod.deb \
-    && apt-get update \
-    # libgssapi-krb5-2: the driver needs it, but its package doesn't declare
-    # it, so we install it ourselves. See the Debian instructions at
-    # https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server
-    && ACCEPT_EULA=Y apt-get install -y --no-install-recommends \
-        msodbcsql18 \
-        unixodbc \
-        libgssapi-krb5-2 \
-    # curl was only needed for the download above, so remove it again
-    && apt-get purge -y curl \
-    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
