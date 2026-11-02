@@ -34,9 +34,14 @@ RUN set -eux; \
     apt-get install -y --no-install-recommends /tmp/packages-microsoft-prod.deb; \
     rm /tmp/packages-microsoft-prod.deb; \
     apt-get update; \
-    ACCEPT_EULA=Y apt-get install -y --no-install-recommends msodbcsql18 unixodbc; \
-    # Remove curl again, but without --auto-remove: Microsoft advises against
-    # it, because it can also remove packages the ODBC driver needs.
+    # libgssapi-krb5-2: the driver needs it, but its package doesn't declare
+    # it, so we install it ourselves. See the Debian instructions at
+    # https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server
+    ACCEPT_EULA=Y apt-get install -y --no-install-recommends \
+        msodbcsql18 \
+        unixodbc \
+        libgssapi-krb5-2; \
+    # curl was only needed for the download above, so remove it again
     apt-get purge -y curl; \
     rm -rf /var/lib/apt/lists/*
 
