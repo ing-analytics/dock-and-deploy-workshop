@@ -7,4 +7,6 @@ CREATE TABLE [current_user]
     DATE DATETIME
 );
 """
-INSERT_USER = "INSERT INTO [current_user](USERNAME, DATE) VALUES ('{user}', GETDATE())"
+# The `?` is filled in by pyodbc. Never build SQL with .format() or f-strings
+# from user input: that allows SQL injection.
+INSERT_USER = "INSERT INTO [current_user](USERNAME, DATE) VALUES (?, GETDATE())"

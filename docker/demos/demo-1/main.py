@@ -5,15 +5,20 @@ import uvicorn
 from fastapi import FastAPI, Request, Body
 from fastapi.logger import logger
 from contextlib import asynccontextmanager
+from database import get_db_conn
 from sql import CREATE_USER_TABLE, INSERT_USER, SELECT_ONE, SELECT_USER
 
-app = FastAPI()
 logger.setLevel(logging.DEBUG)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("HOORAY! APP STARTED")
-    yield
+   logger.info("HOORAY! APP STARTED")
+   # Connect to the database once at startup; None if it is not reachable
+   app.state.db = get_db_conn()
+   yield
+   if app.state.db is not None:
+      app.state.db.close()
 
 app = FastAPI(lifespan=lifespan)
 
@@ -37,7 +42,7 @@ async def db_health(request: Request):
       cursor = conn.cursor()
       cursor.execute(SELECT_ONE)
    except Exception:
-      {"Status": "DB is unhealthy..."}
+      return {"Status": "DB is unhealthy..."}
    return {"Status": "DB is healthy! Yey"}
 
 
@@ -49,8 +54,8 @@ async def get_curr_user(request: Request):
       cursor.execute(SELECT_USER)
       row = cursor.fetchone()
    except Exception as e:
-      return {"Error": e}
-   return {"Current user": row[0]}
+      return {"Error": str(e)}
+   return {"Current user": row[0] if row else None}
 
 
 @app.post("/current-user")
@@ -59,16 +64,15 @@ async def update_curr_user(request: Request, payload: dict = Body(...)):
       conn = request.app.state.db
       cursor = conn.cursor()
    except Exception as e:
-      return {"Error": e}
-   
+      return {"Error": str(e)}
+
    try:
       cursor.execute(CREATE_USER_TABLE)
    except Exception:
       logger.info("TABLE IS ALREADY CREATED")
-      pass
 
-      cursor.execute(INSERT_USER.format(user=payload["username"]))
-      logger.info("New current user is set")
+   cursor.execute(INSERT_USER, payload["username"])
+   logger.info("New current user is set")
    return {"Status": "New Current User Set"}
 
 if __name__ == "__main__":

@@ -20,4 +20,4 @@ docker run -d -p 8501:8501 my-streamlit-app
 
 ### Check the application
 
-Open http://localhost:8051 to see the webapp.
+Open http://localhost:8501 to see the webapp.

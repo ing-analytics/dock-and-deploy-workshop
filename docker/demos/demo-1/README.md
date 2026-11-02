@@ -9,7 +9,7 @@ This is a simple API using FastAPI for workshop/demo use.
 | Variable | Description         | Sample Value                    |
 |----------|---------------------|---------------------------------|
 | APP_HOST | hostname of the app | 0.0.0.0                         |
-| APP_PORT | port of the app     | 80                              |
+| APP_PORT | port of the app     | 8000                            |
 | SERVER   | database server     | localhost:1433                  |
 | DATABASE | database            |                                 |
 | USERNAME | database username   |                                 |
@@ -30,12 +30,12 @@ This is a simple API using FastAPI for workshop/demo use.
 Sample Post Request:
 
 ```curl
-curl -X POST http://localhost:8080/current-user -d '{"username":"workshop_user"}' -H "Content-Type: application/json"
+curl -X POST http://localhost:8000/current-user -d '{"username":"workshop_user"}' -H "Content-Type: application/json"
 ```
 
 ## Running the API Locally
 
-Install requirments:
+Install requirements:
 
 ```sh
 pip install -r requirements.txt
@@ -49,6 +49,25 @@ python main.py
 
 ```sh
 docker build -t my-api:v1 .
+```
+
+### Running the Container
+
+```sh
+docker run --rm -p 8000:8000 my-api:v1
+```
+
+Then open http://localhost:8000/hello.
+
+To use the database endpoints, pass the connection settings as environment variables:
+
+```sh
+docker run --rm -p 8000:8000 \
+  -e SERVER=my-db-server:1433 \
+  -e DATABASE=my_db \
+  -e USERNAME=my_user \
+  -e PASSWORD=my_password \
+  my-api:v1
 ```
 
 ### Deploying to Kubernetes
