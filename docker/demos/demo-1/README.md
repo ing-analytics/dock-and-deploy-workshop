@@ -64,21 +64,21 @@ Then open http://localhost:8000/hello.
 
 The database endpoints need a PostgreSQL database. We run it in a second container.
 Both containers join the same Docker network, so the API can reach the database
-by its container name (`db`).
+by its container name (`demo-1-db`).
 
 ```sh
 # 1. Create a network for the two containers
 docker network create demo-1
 
 # 2. Start PostgreSQL
-docker run -d --name db --network demo-1 \
+docker run -d --name demo-1-db --network demo-1 \
   -e POSTGRES_USER=workshop -e POSTGRES_PASSWORD=workshop \
   -e POSTGRES_DB=workshop \
   postgres:17
 
-# 3. Start the API; SERVER=db:5432 points to the container named db
-docker run -d --name api --network demo-1 -p 8000:8000 \
-  -e SERVER=db:5432 -e DATABASE=workshop \
+# 3. Start the API; SERVER=demo-1-db:5432 points to the container named demo-1-db
+docker run -d --name demo-1-api --network demo-1 -p 8000:8000 \
+  -e SERVER=demo-1-db:5432 -e DATABASE=workshop \
   -e USERNAME=workshop -e PASSWORD=workshop \
   my-api:v1
 
@@ -88,7 +88,7 @@ curl -X POST http://localhost:8000/current-user -d '{"username":"workshop_user"}
 curl http://localhost:8000/current-user
 
 # 5. Clean up
-docker rm -f api db
+docker rm -f demo-1-api demo-1-db
 docker network rm demo-1
 ```
 
