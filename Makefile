@@ -3,6 +3,7 @@
 # All targets are .PHONY: they run commands and don't create files, so make
 # should always run them, even if a file with the same name exists.
 
+DOCKER_COMPOSE_BIN := docker-compose
 DOCKER_DEMO_1 := docker/demos/demo-1
 DOCKER_DEMO_2 := docker/demos/demo-2
 K8S_DEMO_1    := kubernetes/demos/demo-1
@@ -52,15 +53,15 @@ docker-demo-1-down: ## Stop and remove FastAPI + PostgreSQL
 
 .PHONY: docker-demo-2-up
 docker-demo-2-up: ## Start Flask + Redis on http://localhost:8000
-	docker compose -f $(DOCKER_DEMO_2)/compose.yaml up -d --build
+	$(DOCKER_COMPOSE_BIN) -f $(DOCKER_DEMO_2)/compose.yaml up -d --build
 
 .PHONY: docker-demo-2-logs
 docker-demo-2-logs: ## Follow the logs of Flask + Redis (Ctrl+C stops following)
-	docker compose -f $(DOCKER_DEMO_2)/compose.yaml logs -f
+	$(DOCKER_COMPOSE_BIN) -f $(DOCKER_DEMO_2)/compose.yaml logs -f
 
 .PHONY: docker-demo-2-down
 docker-demo-2-down: ## Stop and remove Flask + Redis
-	docker compose -f $(DOCKER_DEMO_2)/compose.yaml down
+	$(DOCKER_COMPOSE_BIN) -f $(DOCKER_DEMO_2)/compose.yaml down
 
 # --- Kubernetes demo 1: pod, init container, deployment, service ----------
 
