@@ -3,7 +3,11 @@
 # All targets are .PHONY: they run commands and don't create files, so make
 # should always run them, even if a file with the same name exists.
 
+# Command used to run Docker Compose. If you only have the newer
+# `docker compose` (without the dash), override it like this:
+#   make docker-demo-2-up DOCKER_COMPOSE_BIN="docker compose"
 DOCKER_COMPOSE_BIN := docker-compose
+
 DOCKER_DEMO_1 := docker/demos/demo-1
 DOCKER_DEMO_2 := docker/demos/demo-2
 K8S_DEMO_1    := kubernetes/demos/demo-1
