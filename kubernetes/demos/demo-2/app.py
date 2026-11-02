@@ -23,15 +23,15 @@ async def health():
 
 
 def _write_count(count: int) -> None:
-    with open(COUNTER_FILE, "w") as f:
+    with open("counter.txt", "w") as f:
         f.write(str(count))
 
 
 def _get_current_count() -> int | None:
-    if not os.path.exists(COUNTER_FILE):
+    if not os.path.exists("counter.txt"):
         _write_count(0)
         return 0
-    with open(COUNTER_FILE) as f:
+    with open("counter.txt") as f:
         contents = f.read()
     try:
         return int(contents)

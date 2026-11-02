@@ -1,5 +1,3 @@
-# Build the image first: docker build -t counter-api:v1 .
-# (with kind, also run: kind load docker-image counter-api:v1)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -17,14 +15,12 @@ spec:
     spec:
       containers:
         - name: counter-api
-          image: counter-api:v1
-          # Use the locally built image instead of pulling it from a registry
-          imagePullPolicy: IfNotPresent
+          image: counter-api
           ports:
-            - containerPort: 8080
+            - containerPort: 80
           env:
-            - name: COUNTER_APP_FILEPATH
-              value: "/app/counter/counter.txt"
+            name: COUNTER_APP_FILEPATH
+            value: "/app/counter/counter.txt"
           volumeMounts:
             - name: counter-volume
               mountPath: /app/counter
@@ -35,12 +31,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: counter-service
+  name: nginx-service
 spec:
   selector:
     run: kubernetes-demo
   ports:
   - protocol: TCP
     port: 80
-    targetPort: 8080
+    targetPort: 80
   type: ClusterIP
