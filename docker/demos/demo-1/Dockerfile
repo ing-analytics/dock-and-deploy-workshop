@@ -19,31 +19,31 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 #   -u  treat unset variables as an error (catches typos like ${VERSOIN_ID})
 #   -x  print each command before running it, so the build log shows
 #       exactly which step was executing when something went wrong
-# Commands are separated with `;` instead of `&&` because -e already
-# stops on the first failure.
+# The commands are chained with `&&`: each one only runs if the previous
+# one succeeded.
 #
 # We don't pin apt package versions (hadolint rule DL3008): old versions are
 # removed from the Debian repos quickly, which would break the build.
 # hadolint ignore=DL3008
-RUN set -eux; \
-    apt-get update; \
-    apt-get install -y --no-install-recommends curl ca-certificates; \
-    . /etc/os-release; \
-    curl -sSL -o /tmp/packages-microsoft-prod.deb \
-        "https://packages.microsoft.com/config/${ID}/${VERSION_ID}/packages-microsoft-prod.deb"; \
-    apt-get install -y --no-install-recommends /tmp/packages-microsoft-prod.deb; \
-    rm /tmp/packages-microsoft-prod.deb; \
-    apt-get update; \
+RUN set -eux \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends curl ca-certificates \
+    && . /etc/os-release \
+    && curl -sSL -o /tmp/packages-microsoft-prod.deb \
+        "https://packages.microsoft.com/config/${ID}/${VERSION_ID}/packages-microsoft-prod.deb" \
+    && apt-get install -y --no-install-recommends /tmp/packages-microsoft-prod.deb \
+    && rm /tmp/packages-microsoft-prod.deb \
+    && apt-get update \
     # libgssapi-krb5-2: the driver needs it, but its package doesn't declare
     # it, so we install it ourselves. See the Debian instructions at
     # https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server
-    ACCEPT_EULA=Y apt-get install -y --no-install-recommends \
+    && ACCEPT_EULA=Y apt-get install -y --no-install-recommends \
         msodbcsql18 \
         unixodbc \
-        libgssapi-krb5-2; \
+        libgssapi-krb5-2 \
     # curl was only needed for the download above, so remove it again
-    apt-get purge -y curl; \
-    rm -rf /var/lib/apt/lists/*
+    && apt-get purge -y curl \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
