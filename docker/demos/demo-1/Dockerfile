@@ -35,7 +35,9 @@ RUN set -eux; \
     rm /tmp/packages-microsoft-prod.deb; \
     apt-get update; \
     ACCEPT_EULA=Y apt-get install -y --no-install-recommends msodbcsql18 unixodbc; \
-    apt-get purge -y --auto-remove curl; \
+    # Remove curl again, but without --auto-remove: Microsoft advises against
+    # it, because it can also remove packages the ODBC driver needs.
+    apt-get purge -y curl; \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
