@@ -1,15 +1,15 @@
-version: '3.8'
 services:
   db:
-    image: postgres:13
+    image: postgres:17
+    # Hint: these values must match the ones hardcoded in web/web.py
     environment:
-      POSTGRES_USER: ###       
-      POSTGRES_PASSWORD: ### 
-      POSTGRES_DB: ###          
+      POSTGRES_USER: ###
+      POSTGRES_PASSWORD: ###
+      POSTGRES_DB: ###
     volumes:
       -  db_data:/var/lib/postgresql/data
     networks:
-      - ###               
+      - ###
 
   web:
     build: ./web
@@ -18,10 +18,10 @@ services:
     depends_on:
       - ##
     networks:
-      - ###                 
+      - ###
 
 volumes:
-  db_data:                    
+  db_data:
 
 networks:
   ###

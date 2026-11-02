@@ -1,17 +1,37 @@
+import time
+
 import psycopg2
 from flask import Flask, render_template_string
 
 app = Flask(__name__)
 
+
+def connect():
+    return psycopg2.connect(
+        user="user",
+        password="password",
+        host="db",
+        port="5432",
+        database="mydatabase"
+    )
+
+
+def wait_for_database(attempts=10):
+    # `depends_on` only waits until the db container has *started*, not until
+    # PostgreSQL is ready to accept connections. So we retry for a while.
+    for attempt in range(1, attempts + 1):
+        try:
+            return connect()
+        except psycopg2.OperationalError as error:
+            print(f"Database not ready yet (attempt {attempt}/{attempts}): {error}")
+            time.sleep(2)
+    raise RuntimeError("Could not connect to the database")
+
+
 def setup_database():
+    connection = None
     try:
-        connection = psycopg2.connect(
-            user="user",
-            password="password",
-            host="db",
-            port="5432",
-            database="mydatabase"
-        )
+        connection = wait_for_database()
         cursor = connection.cursor()
 
         cursor.execute("""
@@ -44,7 +64,6 @@ def setup_database():
         print(f"Error setting up the database: {error}")
     finally:
         if connection:
-            cursor.close()
             connection.close()
 
 @app.route('/')
@@ -69,14 +88,9 @@ def home():
 
 @app.route('/movies')
 def get_movies():
+    connection = None
     try:
-        connection = psycopg2.connect(
-            user="user",
-            password="password",
-            host="db",
-            port="5432",
-            database="mydatabase"
-        )
+        connection = connect()
         cursor = connection.cursor()
         cursor.execute("SELECT title, year, rating FROM movies ORDER BY rating DESC LIMIT 10;")
         movies = cursor.fetchall()
@@ -114,7 +128,6 @@ def get_movies():
         return f"<p>Error: {error}</p>"
     finally:
         if connection:
-            cursor.close()
             connection.close()
 
 if __name__ == '__main__':

@@ -1,17 +1,18 @@
 services:
   redis:
-    image: redislabs/redismod
-    ports:
-      - '6379:6379'
+    image: redis:8-alpine
+    # No `ports:` needed: the web service reaches Redis over the Compose
+    # network at the hostname `redis` (the service name).
+
   web:
-    build:
-      context: .
-      target: builder
+    build: .
     # flask requires SIGINT to stop gracefully
     # (default stop signal from Compose is SIGTERM)
     stop_signal: SIGINT
     ports:
       - '8000:8000'
+    # Mount the source code into the container, so code changes show up
+    # without rebuilding the image (Flask runs with debug=True and reloads).
     volumes:
       - .:/code
     depends_on:

@@ -1,22 +1,28 @@
-FROM python:3.11-bullseye
+FROM python:3.14-slim
 
-ENV APP_HOST=0.0.0.0
-ENV APP_PORT=8000
+# PYTHONDONTWRITEBYTECODE: don't write .pyc files into the image
+# PYTHONUNBUFFERED: print logs immediately (no buffering), so `docker logs` shows them
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    APP_HOST=0.0.0.0 \
+    APP_PORT=8000
 
 WORKDIR /app
-ENV PYTHONPATH=/app
 
-# install mssql and unixodbc
-RUN apt-get update && \
-    apt-get install gnupg -y && \
-    curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
-    curl https://packages.microsoft.com/config/debian/11/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
-    apt-get update && \
-    ACCEPT_EULA=Y apt-get install msodbcsql18 unixodbc-dev -y
-
-COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt
+# Copy requirements.txt on its own first: Docker caches this layer, so
+# dependencies are only reinstalled when requirements.txt changes.
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY *.py ./
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run as a non-root user
+RUN groupadd --gid 1000 pokemon \
+    && useradd --uid 1000 --gid pokemon --create-home pikachu
+USER pikachu
+
+# Documents the port the app listens on (publish it with `docker run -p`)
+EXPOSE 8000
+
+# main.py reads APP_HOST and APP_PORT and starts uvicorn
+CMD ["python", "main.py"]

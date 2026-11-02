@@ -1,0 +1,4 @@
+ignored:
+  # DL3066 wants `USER 1000` instead of `USER pikachu`. We keep the name
+  # because it is easier to read; the user is created with a fixed UID (1000).
+  - DL3066

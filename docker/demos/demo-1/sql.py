@@ -1,10 +1,12 @@
 SELECT_ONE = "SELECT 1"
-SELECT_USER = "SELECT TOP(1) USERNAME FROM [current_user] ORDER BY date DESC"
+SELECT_USER = "SELECT username FROM user_history ORDER BY date DESC LIMIT 1"
 CREATE_USER_TABLE = """
-CREATE TABLE [current_user]
+CREATE TABLE IF NOT EXISTS user_history
 (
-    USERNAME varchar(50),
-    DATE DATETIME
+    username varchar(50),
+    date timestamp
 );
 """
-INSERT_USER = "INSERT INTO [current_user](USERNAME, DATE) VALUES ('{user}', GETDATE())"
+# The `%s` is filled in by psycopg2. Never build SQL with .format() or f-strings
+# from user input: that allows SQL injection.
+INSERT_USER = "INSERT INTO user_history (username, date) VALUES (%s, NOW())"
