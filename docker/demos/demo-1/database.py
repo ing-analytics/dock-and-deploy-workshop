@@ -3,8 +3,13 @@ import os
 import pyodbc
 
 
+def to_sql_server_address(server):
+    """Turn the usual "host:port" into "host,port", which SQL Server expects."""
+    return server.replace(":", ",")
+
+
 def get_db_conn():
-    server = os.getenv("SERVER", "localhost:1433")
+    server = to_sql_server_address(os.getenv("SERVER", "localhost:1433"))
     database = os.getenv("DATABASE")
     username = os.getenv("USERNAME")
     password = os.getenv("PASSWORD")
