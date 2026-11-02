@@ -13,20 +13,13 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 # (per https://learn.microsoft.com/en-us/linux/packages), which adds their
 # package repository and signing key, then install the driver from it.
 #
-# `set -eux` makes this multi-command RUN step safer and easier to debug:
-#   -e  exit immediately if any command fails, so the build stops at the
-#       real error instead of carrying on and producing a broken image
-#   -u  treat unset variables as an error (catches typos like ${VERSOIN_ID})
-#   -x  print each command before running it, so the build log shows
-#       exactly which step was executing when something went wrong
 # The commands are chained with `&&`: each one only runs if the previous
-# one succeeded.
+# one succeeded, so the build stops at the first error.
 #
 # We don't pin apt package versions (hadolint rule DL3008): old versions are
 # removed from the Debian repos quickly, which would break the build.
 # hadolint ignore=DL3008
-RUN set -eux \
-    && apt-get update \
+RUN apt-get update \
     && apt-get install -y --no-install-recommends curl ca-certificates \
     && . /etc/os-release \
     && curl -sSL -o /tmp/packages-microsoft-prod.deb \
