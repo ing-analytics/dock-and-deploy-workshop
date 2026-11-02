@@ -11,8 +11,8 @@ Create a [Dockerfile](https://docs.docker.com/build/concepts/dockerfile/) to con
 
 Your Dockerfile needs to:
 
-- start from a Python base image, for example `python:3.14-slim`
-- install the packages from `requirements.txt`
+- start from a Python base image
+- install the package dependencies
 - copy `app.py` and `data.csv` into the image
 - document that Streamlit listens on port `8501`
 - start the app with this command:
@@ -21,8 +21,9 @@ Your Dockerfile needs to:
   streamlit run app.py --server.address=0.0.0.0 --browser.gatherUsageStats=false
   ```
 
-  `--server.address=0.0.0.0` makes the app reachable from outside the container.
   `--browser.gatherUsageStats=false` stops Streamlit from sending usage statistics.
+
+Bonus question: why is the server address `0.0.0.0`
 
 ### Building the Image
 
