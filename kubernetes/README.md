@@ -19,18 +19,23 @@ Apply the files in order: `1-pod.yaml`, `2-pod-with-init.yaml`, `3-deployment.ya
 
 ## Demo 2: Counter API with a volume and a Job
 
-Build the image first. On Docker Desktop, Kubernetes can use locally built
-images directly:
+The image `counter-api:v1` is built from `demos/demo-2/Dockerfile`.
+It isn't published to any registry, so build it before deploying. From the
+repository root:
 
 ```sh
-docker build -t counter-api:v1 kubernetes/demos/demo-2
-kubectl apply -f kubernetes/demos/demo-2/1-deploy.yaml
-kubectl apply -f kubernetes/demos/demo-2/2-job.yaml   # increments the counter 3 times
+make k8s-demo-2-build      # docker build -t counter-api:v1 kubernetes/demos/demo-2
+make k8s-demo-2-up         # deploy the counter API and its Service
+make k8s-demo-2-job        # run the Job (increments the counter 3 times), show its logs
+make k8s-demo-2-down       # clean up
 ```
 
-On kind or minikube, load the image into the cluster first
-(`kind load docker-image counter-api:v1` or
-`minikube image load counter-api:v1`).
+On Docker Desktop, Kubernetes can use locally built images directly. kind and
+minikube can't: build and load the image with `make k8s-demo-2-load-kind`
+or `make k8s-demo-2-load-minikube` instead of `make k8s-demo-2-build`.
+
+If you change the tag, change it in both the `Makefile` (`COUNTER_API_IMAGE`)
+and `demos/demo-2/1-deploy.yaml` (`image:`).
 
 Tear down demo 1 before starting demo 2. Both demos use the Deployment
 name `my-deployment`, the Service name `nginx-service` and the label
