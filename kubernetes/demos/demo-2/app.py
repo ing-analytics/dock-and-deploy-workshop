@@ -23,20 +23,22 @@ async def health():
 
 
 def _write_count(count: int) -> None:
-    with open("counter.txt", "w") as f:
+    with open(COUNTER_FILE, "w") as f:
         f.write(str(count))
 
 
-def _get_current_count() -> int | None:
-    if not os.path.exists("counter.txt"):
+def _get_current_count() -> int:
+    if not os.path.exists(COUNTER_FILE):
         _write_count(0)
         return 0
-    with open("counter.txt") as f:
+    with open(COUNTER_FILE) as f:
         contents = f.read()
     try:
         return int(contents)
     except ValueError:
-        return None
+        # Corrupt or empty file: start counting again from 0
+        logger.warning("Invalid counter file %s, resetting to 0", COUNTER_FILE)
+        return 0
 
 
 @app.post("/counter")
