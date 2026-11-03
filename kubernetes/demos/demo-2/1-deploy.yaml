@@ -15,12 +15,15 @@ spec:
     spec:
       containers:
         - name: counter-api
-          image: counter-api
+          # Built locally: docker build -t counter-api:v1 kubernetes/demos/demo-2
+          image: counter-api:v1
+          # Use the local image instead of trying to pull it from a registry
+          imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 80
+            - containerPort: 8080 # fastapi listens on 8080, see Dockerfile
           env:
-            name: COUNTER_APP_FILEPATH
-            value: "/app/counter/counter.txt"
+            - name: COUNTER_APP_FILEPATH
+              value: "/app/counter/counter.txt"
           volumeMounts:
             - name: counter-volume
               mountPath: /app/counter
@@ -38,5 +41,5 @@ spec:
   ports:
   - protocol: TCP
     port: 80
-    targetPort: 80
+    targetPort: 8080
   type: ClusterIP

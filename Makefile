@@ -1,4 +1,4 @@
-# Shortcuts for the Docker demos. Run `make` (or `make help`) to list them.
+# Shortcuts for the Docker and Kubernetes demos. Run `make` (or `make help`) to list them.
 #
 # All targets are .PHONY: they run commands and don't create files, so make
 # should always run them, even if a file with the same name exists.
@@ -64,3 +64,45 @@ docker-demo-2-logs: ## Follow the logs of Flask + Redis (Ctrl+C stops following)
 .PHONY: docker-demo-2-down
 docker-demo-2-down: ## Stop and remove Flask + Redis
 	$(DOCKER_COMPOSE_BIN) -f $(DOCKER_DEMO_2)/compose.yaml down
+
+# --- Kubernetes demo 2: counter API with a volume and a Job ----------------
+#
+# The image name must match `image:` in $(K8S_DEMO_2)/1-deploy.yaml. The
+# manifest uses imagePullPolicy: IfNotPresent, so the cluster uses the image
+# you built locally instead of pulling it from a registry.
+#
+# Docker Desktop's Kubernetes sees locally built images directly. kind and
+# minikube run their own container runtime: load the image into the cluster
+# after building it (k8s-demo-2-load-kind / k8s-demo-2-load-minikube).
+
+K8S_DEMO_2 := kubernetes/demos/demo-2
+COUNTER_API_IMAGE := counter-api:v1
+
+.PHONY: k8s-demo-2-build
+k8s-demo-2-build: ## Build the counter API image (counter-api:v1)
+	docker build -t $(COUNTER_API_IMAGE) $(K8S_DEMO_2)
+
+.PHONY: k8s-demo-2-load-kind
+k8s-demo-2-load-kind: k8s-demo-2-build ## Build the counter API image and load it into kind
+	kind load docker-image $(COUNTER_API_IMAGE)
+
+.PHONY: k8s-demo-2-load-minikube
+k8s-demo-2-load-minikube: k8s-demo-2-build ## Build the counter API image and load it into minikube
+	minikube image load $(COUNTER_API_IMAGE)
+
+.PHONY: k8s-demo-2-up
+k8s-demo-2-up: ## Deploy the counter API and its Service (build/load the image first)
+	kubectl apply -f $(K8S_DEMO_2)/1-deploy.yaml
+
+.PHONY: k8s-demo-2-job
+k8s-demo-2-job: ## Run the Job that increments the counter 3 times, then show its output
+	@# A finished Job can't be re-run: delete the old one first
+	-kubectl delete job api-request-job --ignore-not-found
+	kubectl apply -f $(K8S_DEMO_2)/2-job.yaml
+	kubectl wait --for=condition=complete --timeout=60s job/api-request-job
+	kubectl logs job/api-request-job
+
+.PHONY: k8s-demo-2-down
+k8s-demo-2-down: ## Remove the counter API, its Service and the Job
+	-kubectl delete -f $(K8S_DEMO_2)/2-job.yaml --ignore-not-found
+	-kubectl delete -f $(K8S_DEMO_2)/1-deploy.yaml --ignore-not-found
